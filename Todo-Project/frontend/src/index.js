@@ -8,6 +8,15 @@ class TodoApp extends React.Component {
     constructor(props) {
       super(props);
       this.state = { items: [], text: '' , todoid: 20};
+      axios.get('/api/todos/20')
+      .then(res => {
+        this.setState({
+          items: res.data.todoItems
+       });
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -16,7 +25,7 @@ class TodoApp extends React.Component {
       return (
         <div>
           <h3>TODO</h3>
-          <TodoList items={this.state.items} complete={this.completeTodo.bind(this)}/>
+          <TodoList items={this.state.items} complete={this.completeTodo.bind(this)} delete={this.deleteTodo.bind(this)}/>
           <form onSubmit={this.handleSubmit}>
             <label htmlFor="new-todo">
               What needs to be done?
@@ -86,14 +95,31 @@ class TodoApp extends React.Component {
       })
 
     }
+    deleteTodo(todo) {
+      const todos = this.state.items
+      for (var i = 0; i < todos.length; i++) {
+        if (todos[i].id === todo.id) {
+          todos[i].complete = ""
+          todos[i].id = ""
+          todos[i].content = ""
+          break;
+        }
+      }
+      this.setState({
+        items: todos
+     });
+    }
+
   }
+
+  
   
   class TodoList extends React.Component {
     render() {
       return (
         <ul>
           {this.props.items.map(item => (
-            <Todo todo={item} complete={this.props.complete}/>
+            <Todo todo={item} complete={this.props.complete} delete={this.props.delete}/>
           ))}
         </ul>
       );
@@ -106,18 +132,25 @@ class TodoApp extends React.Component {
       this.props.complete(this.props.todo);
     }
 
+    delete(e) {
+      e.preventDefault();
+      this.props.delete(this.props.todo);
+    }
+
     render() {
         let todo = this.props.todo;
         if (todo.complete) {
             return (
                 <li>
-                    <del>{todo.content}</del> <a href="" onClick={this.done.bind(this)}>✓</a>
+                    <del>{todo.content}</del> <a href="" onClick={this.done.bind(this)}>✓  </a>
+                    <a href="" onClick={this.delete.bind(this)}>-</a>
                 </li>
             );
         } else {
             return (
                 <li>
-                    {todo.content} <a href="" onClick={this.done.bind(this)}>✓</a>
+                    {todo.content} <a href="" onClick={this.done.bind(this)}>✓  </a>
+                    <a href="" onClick={this.delete.bind(this)}>-</a>
                 </li>
             );
         }
