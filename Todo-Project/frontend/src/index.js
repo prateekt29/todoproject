@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import ReactDOM from "react-dom";
-import "./index.css";
+import "./bootstrap.css";
 
 class TodoApp extends React.Component {
   constructor(props) {
@@ -42,24 +42,28 @@ class TodoApp extends React.Component {
   render() {
     return (
       <div>
-        <h1>TODO</h1>
-        <form class="form-inline my-2 my-lg-0" onSubmit={this.handleSubmit}>
-          <input
-            class="form-control mr-sm-2"
-            type="text"
-            placeholder="What needs to be done?"
-            onChange={this.handleChange}
-            value={this.state.text}
-          />
-          <button class="btn btn-secondary my-2 my-sm-0" type="submit">
-            Add
-          </button>
-        </form>
-        <TodoList
-          items={this.state.items}
-          complete={this.completeTodo.bind(this)}
-          delete={this.deleteTodo.bind(this)}
-        />
+        <h1 className="text-center">TODO</h1>
+        <div className="row col-12">
+          <div className="container">
+            <form class="form-inline col-12" onSubmit={this.handleSubmit}>
+              <input
+                class="form-control col-11"
+                type="text"
+                placeholder="What needs to be done?"
+                onChange={this.handleChange}
+                value={this.state.text}
+              />
+              <button class="btn btn-secondary col-1" type="submit">
+                Add
+              </button>
+            </form>
+            <TodoList
+              items={this.state.items}
+              complete={this.completeTodo.bind(this)}
+              delete={this.deleteTodo.bind(this)}
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -73,9 +77,6 @@ class TodoApp extends React.Component {
     if (!this.state.text.length) {
       return;
     }
-    const newtodo = {
-      title: "new-todo"
-    };
     const newtodoitem = {
       complete: false,
       content: this.state.text
@@ -139,15 +140,19 @@ class TodoApp extends React.Component {
 class TodoList extends React.Component {
   render() {
     return (
-      <ul>
-        {this.props.items.map((item) => (
-          <Todo
-            todo={item}
-            complete={this.props.complete}
-            delete={this.props.delete}
-          />
-        ))}
-      </ul>
+      <div className="container">
+        <table className="table table-bordered">
+          <tbody>
+            {this.props.items.map((item) => (
+              <Todo
+                todo={item}
+                complete={this.props.complete}
+                delete={this.props.delete}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 }
@@ -168,40 +173,44 @@ class Todo extends React.Component {
 
     if (todo.complete) {
       return (
-        <table class="table table-hover">
-          <tbody>
-            <tr class="table-active">
-              <th scope="row">
-                <del>{todo.content}</del>
-              </th>
-              <td>
-                <a href="" onClick={this.delete.bind(this)}>
-                  [-]
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <tr>
+          <td>
+            <del>{todo.content}</del>
+          </td>
+          <td>
+            <a
+              href=""
+              className="btn btn-danger"
+              onClick={this.delete.bind(this)}
+            >
+              [-]
+            </a>
+          </td>
+        </tr>
       );
     } else {
       return (
-        <table class="table table-hover">
-          <tbody>
-            <tr class="table-active">
-              <th scope="row">{todo.content}</th>
-              <td>
-                <a href="" onClick={this.done.bind(this)}>
-                  [✓]
-                </a>
-              </td>
-              <td>
-                <a href="" onClick={this.delete.bind(this)}>
-                  [-]
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <tr>
+          <td>{todo.content}</td>
+          <td>
+            <a
+              className="btn btn-success"
+              href=""
+              onClick={this.done.bind(this)}
+            >
+              [✓]
+            </a>
+          </td>
+          <td>
+            <a
+              className="btn btn-danger"
+              href=""
+              onClick={this.delete.bind(this)}
+            >
+              [-]
+            </a>
+          </td>
+        </tr>
       );
     }
   }
