@@ -8,6 +8,11 @@ class TodoApp extends React.Component {
     constructor(props) {
       super(props);
       this.state = { items: [], text: '' , todoid: 20};
+      this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentDidMount() {
       axios.get('/api/todos/20')
       .then(res => {
         this.setState({
@@ -17,8 +22,6 @@ class TodoApp extends React.Component {
       .catch(function (error) {
         console.log(error);
       })
-      this.handleChange = this.handleChange.bind(this);
-      this.handleSubmit = this.handleSubmit.bind(this);
     }
   
     render() {
@@ -96,12 +99,20 @@ class TodoApp extends React.Component {
 
     }
     deleteTodo(todo) {
+      axios.delete('/api/todos/' + this.state.todoid + '/items/' + todo.id)
+      .then(res => {
+        if(res.status === 204){
+          
+        }
+        console.log(res.status)
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
       const todos = this.state.items
       for (var i = 0; i < todos.length; i++) {
         if (todos[i].id === todo.id) {
-          todos[i].complete = ""
-          todos[i].id = ""
-          todos[i].content = ""
+          delete todos[i]
           break;
         }
       }
@@ -139,10 +150,13 @@ class TodoApp extends React.Component {
 
     render() {
         let todo = this.props.todo;
+        if(!todo.content){
+          return(<li></li>);
+        }
         if (todo.complete) {
             return (
                 <li>
-                    <del>{todo.content}</del> <a href="" onClick={this.done.bind(this)}>✓  </a>
+                    <del>{todo.content}</del>
                     <a href="" onClick={this.delete.bind(this)}>-</a>
                 </li>
             );
