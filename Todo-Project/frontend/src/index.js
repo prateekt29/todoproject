@@ -7,7 +7,7 @@ import './index.css';
 class TodoApp extends React.Component {
     constructor(props) {
       super(props);
-      this.state = { items: [], text: '' , todoid: 13};
+      this.state = { items: [], text: '' , todoid: 20};
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -16,7 +16,7 @@ class TodoApp extends React.Component {
       return (
         <div>
           <h3>TODO</h3>
-          <TodoList items={this.state.items} />
+          <TodoList items={this.state.items} complete={this.completeTodo.bind(this)}/>
           <form onSubmit={this.handleSubmit}>
             <label htmlFor="new-todo">
               What needs to be done?
@@ -50,17 +50,7 @@ class TodoApp extends React.Component {
         "complete":false,
         "content": this.state.text
       };
-
-      console.log(newtodoitem)
-      // axios.post(`/api/todos`, newtodo)
-      // .then(res => {
-      //   this.setState({ todoid: res.data.id });
-      //   console.log(res.data.id)
-      // })
-      // .catch(function (error) {
-      //   console.log(error);
-      // })
-
+      
       axios.post('/api/todos/' + this.state.todoid + '/items', newtodoitem)
       .then(res => {
         newtodoitem["id"] = res.data.id
@@ -74,23 +64,65 @@ class TodoApp extends React.Component {
         console.log(error);
       })
     }
+
+    completeTodo(todo) {
+      const todos = this.state.items
+      for (var i = 0; i < todos.length; i++) {
+        if (todos[i].id === todo.id) {
+          todos[i].complete = true;
+          break;
+        }
+      }
+      this.setState({
+        items: todos
+     });
+
+     axios.put('/api/todos/' + this.state.todoid + '/items/' + todo.id, {complete : true})
+      .then(res => {
+        console.log(res.status)
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+
+    }
   }
   
   class TodoList extends React.Component {
-    done(e) {
-      e.preventDefault();
-      console.log("Task is done")
-    }
     render() {
       return (
         <ul>
           {this.props.items.map(item => (
-            <li>{item.content}<a href="" onClick={this.done.bind(this)}>✓</a></li>
+            <Todo todo={item} complete={this.props.complete}/>
           ))}
         </ul>
       );
     }
   }
+
+  class Todo extends React.Component {
+    done(e) {
+      e.preventDefault();
+      this.props.complete(this.props.todo);
+    }
+
+    render() {
+        let todo = this.props.todo;
+        if (todo.complete) {
+            return (
+                <li>
+                    <del>{todo.content}</del> <a href="" onClick={this.done.bind(this)}>✓</a>
+                </li>
+            );
+        } else {
+            return (
+                <li>
+                    {todo.content} <a href="" onClick={this.done.bind(this)}>✓</a>
+                </li>
+            );
+        }
+    }
+}
   
   ReactDOM.render(<TodoApp />, document.getElementById('root'));
   
